@@ -53,7 +53,10 @@ Edit the config file to fit your sistem. the only field required is download_pat
   [user:password@]proxy.com:port/
   
 ## Run at Windows startup
-To change your wallpaper at Windows startup, create a shortcut to apod_wallpaper.py in Start->All Programs->Startup. 
+To update the wallpaper at Windows startup, create a shortcut to the file apod_wallpaper.py in:
+
+Start->All Programs->Startup
+
 If you are one of those like me who doesn't logoff very often you will also have the script to hand whenever you want to update your wallpaper.
 
 ## Windows screensaver setup
