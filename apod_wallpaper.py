@@ -9,10 +9,9 @@ import io
 import configparser
 import win32api, win32con, win32gui
 
-TILE_WALLPAPER = "0" # 1 tile the image if style is center
+TILE_WALLPAPER = "0" # 1 tiles image if style is center
 
-logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
-                    datefmt='%Y/%d/%m %H:%M:%S', level=logging.ERROR)
+logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',datefmt='%Y/%d/%m %H:%M:%S', level=logging.Error)
 log = logging.getLogger()
 
 config = configparser.ConfigParser()
@@ -33,16 +32,17 @@ style_names = {1: "center", 2: "stretch", 3: "fit", 4: "fill"}
 
 def dispatch_http_get(url, p=None):
     global proxy
+    r = None
     try:
-        log.info("Dispatching HTTP GET Request %s ", url)
+        log.info("Dispatching HTTP GET Request %s... ", url)
         r = requests.get(url, proxies=p)
         log.info("Retrieved response")
     except:
         if proxy is not None and p is None:
-            log.info("Trying with proxy")
+            log.warning("Trying with proxy...")
             r = dispatch_http_get(url, proxy)
         else:
-            log.error("HTTP GET Request Error")
+            log.error("HTTP GET Request Error!")
     return r
 
 
@@ -56,15 +56,15 @@ def human_readable_size(number_bytes):
 def download_image(url):
     filename = os.path.splitext(os.path.basename(url))[0]
     filename = os.path.join(download_path, filename + '.bmp')
-    if not os.path.isfile(filename):
-        log.info("Downloading image")
+    if os.path.isfile(filename):
+        log.info("This picture had been already downloaded")
+    else:
+        log.info("Downloading image...")
         r = dispatch_http_get(url)
         file_size = human_readable_size(float(r.headers["content-length"]))
-        log.info("writing %s to disk", file_size)
+        log.info("writing %s to disk...", file_size)
         Image.open(io.BytesIO(r.content)).save(filename, 'BMP')
         log.info("saved file %s", filename)
-    else:
-        log.info("This picture had been already downloaded")
     return filename
 
 
@@ -94,24 +94,25 @@ def set_windows_wallpaper(file_path, wallpaper_style):
     win32api.RegSetValueEx(key, "TileWallpaper", 0, win32con.REG_SZ, TILE_WALLPAPER)
     win32gui.SystemParametersInfo(win32con.SPI_SETDESKWALLPAPER, file_path, 1 + 2)
 
-
-log.info("Getting content")
-content = dispatch_http_get(apod_url + "concept_tags=True&api_key=" + api_key)
-if content is not None:
-    content = json.loads(content.text)
-    if content['media_type'] == "image":
-        print(content['title'] + '\n')
-        print(content['explanation'] + '\n')
-        # Download image
-        filename = download_image(content['hdurl'])
-        user_input = "4"
-        while user_input.isnumeric() and int(user_input) <= len(styles):
-            # Set wallpaper
-            set_windows_wallpaper(filename, user_input)
-            # wait for user input (1 to 4 change the wallpaper style, otherwise exit)
-            user_input = input()
+if __name__ == '__main__':
+    log.info("Requesting content")
+    content = dispatch_http_get(apod_url + "concept_tags=True&api_key=" + api_key)
+    if content is None:
+        print("NASA APOD unavailable!")
     else:
-        print("\nToday's picture is a " + content['media_type'] + ", please visit http://apod.nasa.gov/apod/astropix.html")
-        input()
-
-log.info("Exit")
+        content = json.loads(content.text)
+        if not content['media_type'] == "image":                
+            print("\nToday's picture is a " + content['media_type'] + ", please visit http://apod.nasa.gov/apod/astropix.html")
+            input()
+        else:
+            print(content['title'] + '\n')
+            print(content['explanation'] + '\n')
+            # Download image
+            filename = download_image(content['hdurl'])
+            user_input = "4"
+            while user_input.isnumeric() and int(user_input) <= len(styles):
+                # Set wallpaper
+                set_windows_wallpaper(filename, user_input)
+                # wait for user input (1 to 4 change the wallpaper style, otherwise exit)
+                user_input = input()
+    log.info("Exit")
