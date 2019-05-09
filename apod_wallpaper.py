@@ -1,27 +1,31 @@
 #!/usr/bin/env python
 # -*-coding:utf-8-*-
+import sys
 import requests
 import logging
 import os
-import json
 from PIL import Image
 import io
 import configparser
 import win32api, win32con, win32gui
+import subprocess
 
 TILE_WALLPAPER = "0" # 1 tiles image if style is center
 
-logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',datefmt='%Y/%d/%m %H:%M:%S', level=logging.Error)
+logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                    datefmt='%Y/%d/%m %H:%M:%S', level=logging.ERROR)
 log = logging.getLogger()
 
 config = configparser.ConfigParser()
 try:
     config.read(os.getcwd() + "/apod_wallpaper.conf")
-    api_key = config.get("main", "api_key")
-    apod_url = config.get("main", "api_url")
-    px = config.get("main", "proxy")
-    proxy = {"http": "http://" + px, "https": "https://" + px}
-    download_path = config.get("main", "download_path")
+    api_key = config.get("api", "key")
+    apod_url = config.get("api", "url")
+    px = config.get("proxy", "address") + ":" + config.get("proxy", "port")
+    proxy = {"https": "https://" + px, "http": "http://" + px}
+    path_local_proxy = config.get("proxy", "local_path")
+    download_path = config.get("default", "download_path")
+    def_wallpaper_style = config.get("default", "wallpaper_style")
 except:
     log.error("Missing or wrong config file!")
     raise
@@ -37,12 +41,12 @@ def dispatch_http_get(url, p=None):
         log.info("Dispatching HTTP GET Request %s... ", url)
         r = requests.get(url, proxies=p)
         log.info("Retrieved response")
-    except:
+    except Exception as e:
         if proxy is not None and p is None:
-            log.warning("Trying with proxy...")
+            log.warning("Trying with proxy %s...", proxy)
             r = dispatch_http_get(url, proxy)
         else:
-            log.error("HTTP GET Request Error!")
+            log.error("HTTP GET Request Error: %s", e)
     return r
 
 
@@ -57,7 +61,7 @@ def download_image(url):
     filename = os.path.splitext(os.path.basename(url))[0]
     filename = os.path.join(download_path, filename + '.bmp')
     if os.path.isfile(filename):
-        log.info("This picture had been already downloaded")
+        log.info("today's picture has been already downloaded before")
     else:
         log.info("Downloading image...")
         r = dispatch_http_get(url)
@@ -94,13 +98,27 @@ def set_windows_wallpaper(file_path, wallpaper_style):
     win32api.RegSetValueEx(key, "TileWallpaper", 0, win32con.REG_SZ, TILE_WALLPAPER)
     win32gui.SystemParametersInfo(win32con.SPI_SETDESKWALLPAPER, file_path, 1 + 2)
 
+def exit_program():
+    log.info("Exit")
+    sys.exit()
+
 if __name__ == '__main__':
+    if path_local_proxy is not None:
+        if os.path.isfile(path_local_proxy):
+            log.info("Opening cntlm at " + path_local_proxy)
+            p=subprocess.Popen('\"'+path_local_proxy+'\"') 
+            log.info("done")
+        else:
+            log.error("Local proxy file not found " + path_local_proxy)
+            exit_program()
+            
     log.info("Requesting content")
     content = dispatch_http_get(apod_url + "concept_tags=True&api_key=" + api_key)
     if content is None:
         print("NASA APOD unavailable!")
+        input()
     else:
-        content = json.loads(content.text)
+        content = content.json()
         if not content['media_type'] == "image":                
             print("\nToday's picture is a " + content['media_type'] + ", please visit http://apod.nasa.gov/apod/astropix.html")
             input()
@@ -108,11 +126,15 @@ if __name__ == '__main__':
             print(content['title'] + '\n')
             print(content['explanation'] + '\n')
             # Download image
-            filename = download_image(content['hdurl'])
-            user_input = "4"
+            url_img = content['hdurl'] if 'hdurl' in content else content['url']
+            filename = download_image(url_img)
+            user_input = def_wallpaper_style
             while user_input.isnumeric() and int(user_input) <= len(styles):
                 # Set wallpaper
                 set_windows_wallpaper(filename, user_input)
                 # wait for user input (1 to 4 change the wallpaper style, otherwise exit)
                 user_input = input()
-    log.info("Exit")
+    if path_local_proxy is not None:
+        log.info("closing cntlm")
+        p.terminate()
+    exit_program()
