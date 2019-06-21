@@ -19,7 +19,7 @@ Then I recommend adding the script to the Windows startup to run every time you 
 - Requests
 - Pillow
 
-## Installation
+## Installation with PIP
 - Download and install Python
 
   https://www.python.org/downloads/
@@ -31,8 +31,19 @@ Then I recommend adding the script to the Windows startup to run every time you 
 - Install Python packages
 
   ```python
-  pip install requests pillow
+  pip install requests pillow configparser
   ```
+  
+  ## Installation with Conda
+  
+    ```python
+  conda create -n apod.py3.6 python=3.6
+  conda activate apod.py3.6
+  conda install requests configparser
+  conda install -c anaconda pywin32
+  pip install pillow 
+  ```
+  
   
 ## Configuration
 Edit the config file to fit your sistem. the only field required is download_path the rest are optional.
