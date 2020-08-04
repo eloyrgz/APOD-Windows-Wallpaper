@@ -17,6 +17,8 @@ Then I recommend adding the script to the Windows startup to run every time you 
 - Python 3 or higher
 - PyWin32
 - A few python packages (requests, configparser, warnings, pillow)
+- Miniconda (optional)
+- CNTLM (optional)
 
 ## Installation with Conda (recommended)
 
