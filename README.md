@@ -20,17 +20,16 @@ Then I recommend adding the script to the Windows startup to run every time you 
 
 ## Installation with Conda (recomended)
 
-Well, first you will need to install [miniconda](https://docs.conda.io/en/latest/miniconda.html). 
-
-Then run the following commands:
+- Well, first you will need to install [miniconda](https://docs.conda.io/en/latest/miniconda.html). 
+- Then run the following commands:
 
   ```python
-conda create -n apod.py3.6 python=3.6
-conda activate apod.py3.6
-conda install requests configparser warnings
-conda install -c anaconda pywin32
-pip install pillow 
-```
+  conda create -n apod.py3.6 python=3.6
+  conda activate apod.py3.6
+  conda install requests configparser warnings
+  conda install -c anaconda pywin32
+  pip install pillow 
+  ```
 
 ## Installation with PIP
 - Download and install [Python](https://www.python.org/downloads/)
