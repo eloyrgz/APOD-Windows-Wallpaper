@@ -1,7 +1,6 @@
-# APOD Windows Wallpaper
-This script downloads the Astronomy Picture of the Day from the Nasa site and sets it as your Windows wallpaper. It also shows the title and explanation while the picture is being downloaded and once the wallpaper was set, lets you to change among 4 different image's styles (center, stretch, fit, fill) using the number keys 1 to 4. Default is fill, 4. Any other key exits the program.
+This script downloads the Astronomy Picture of the Day from the Nasa website and sets it as your Windows wallpaper. It also shows the title and explanation while the picture is being downloaded and once the wallpaper was set, lets you to change among 4 different image's styles (center, stretch, fit, fill) using the number keys 1 to 4. Default is fill, 4. Any other key exits the program.
 
-For getting this to work follow the installation and configuration instructions. If something doesn't work set the logging level to INFO to see the messages about what the script is doing and help you to detect the problem.
+Follow the installation and configuration instructions. If something doesn't work set the logging level to INFO to see the messages about what the script is doing and help you to detect the problem.
 
 Then I recommend adding the script to the Windows startup to run every time you are logged in or at a scheduled time for instance. You can also setup the Windows screensaver to show the imagery from the downloads folder of the script.
 
@@ -18,7 +17,7 @@ Then I recommend adding the script to the Windows startup to run every time you 
 - PyWin32
 - A few python packages (requests, configparser, warnings, pillow)
 
-## Installation with Conda (recomended)
+## Installation with Conda (recommended)
 
 - Well, first you will need to install [miniconda](https://docs.conda.io/en/latest/miniconda.html). 
 - Then run the following commands:
