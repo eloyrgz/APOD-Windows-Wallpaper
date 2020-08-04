@@ -1,3 +1,4 @@
+# APOD Windows Wallpaper
 This script downloads the Astronomy Picture of the Day from the Nasa website and sets it as your Windows wallpaper. It also shows the title and explanation while the picture is being downloaded and once the wallpaper was set, lets you to change among 4 different image's styles (center, stretch, fit, fill) using the number keys 1 to 4. Default is fill, 4. Any other key exits the program.
 
 Follow the installation and configuration instructions. If something doesn't work set the logging level to INFO to see the messages about what the script is doing and help you to detect the problem.
