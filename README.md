@@ -33,16 +33,16 @@ Then I recommend adding the script to the Windows startup to run every time you 
   ```python
   pip install requests pillow configparser
   ```
-  
-  ## Installation with Conda
-  
-    ```python
-  conda create -n apod.py3.6 python=3.6
-  conda activate apod.py3.6
-  conda install requests configparser
-  conda install -c anaconda pywin32
-  pip install pillow 
-  ```
+
+## Installation with Conda
+
+  ```python
+conda create -n apod.py3.6 python=3.6
+conda activate apod.py3.6
+conda install requests configparser
+conda install -c anaconda pywin32
+pip install pillow 
+```
   
   
 ## Configuration
