@@ -52,6 +52,9 @@ def print_banner():
 def cntlm_running():
     return win32serviceutil.QueryServiceStatus('cntlm', proxy_addr)[1] == 4
 
+def cntlm_running():
+    return win32serviceutil.QueryServiceStatus('cntlm', proxy_addr)[1] == 4
+
 def dispatch_http_get(url, p=None):
     global proxy
     r = None
@@ -122,7 +125,10 @@ def exit_program():
     sys.exit()
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     print_banner()
+=======
+>>>>>>> 46fb1c45c4af44b82786bbbdd97b4536abc5ad4b
     if True and not cntlm_running():
         log.info("Starting cntlm service")
         win32serviceutil.StartService('cntlm', proxy_addr)
@@ -152,7 +158,13 @@ if __name__ == '__main__':
                 user_input = input()
     if True:
         log.info("Stoping cntlm service")
+<<<<<<< HEAD
         #win32serviceutil.StopService('cntlm', proxy_addr)
         log.info("done")
 
+=======
+        win32serviceutil.StopService('cntlm', proxy_addr)
+        log.info("done")
+        
+>>>>>>> 46fb1c45c4af44b82786bbbdd97b4536abc5ad4b
     exit_program()
