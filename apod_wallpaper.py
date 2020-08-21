@@ -37,6 +37,17 @@ except:
 styles = {1: "0", 2: "2", 3: "6", 4: "10"}
 style_names = {1: "center", 2: "stretch", 3: "fit", 4: "fill"}
 
+def print_banner():
+        print(
+        "\n\n"
+        "\t`...     `..      `.         `.. ..        `.                  `.       `.......      `....     `.....    \n"
+        "\t`. `..   `..     `. ..     `..    `..     `. ..               `. ..     `..    `..  `..    `..  `..   `.. \n"
+        "\t`.. `..  `..    `.  `..     `..          `.  `..             `.  `..    `..    `..`..        `..`..    `..\n"
+        "\t`..  `.. `..   `..   `..      `..       `..   `..           `..   `..   `.......  `..        `..`..    `..\n"
+        "\t`..   `. `..  `...... `..        `..   `...... `..         `...... `..  `..       `..        `..`..    `..\n"
+        "\t`..    `. .. `..       `.. `..    `.. `..       `..       `..       `.. `..         `..     `.. `..   `.. \n"
+        "\t`..      `..`..         `..  `.. ..  `..         `..     `..         `..`..           `....     `.....    \n\n"
+    )
 
 def cntlm_running():
     return win32serviceutil.QueryServiceStatus('cntlm', proxy_addr)[1] == 4
@@ -111,6 +122,7 @@ def exit_program():
     sys.exit()
 
 if __name__ == '__main__':
+    print_banner()
     if True and not cntlm_running():
         log.info("Starting cntlm service")
         win32serviceutil.StartService('cntlm', proxy_addr)
@@ -140,7 +152,7 @@ if __name__ == '__main__':
                 user_input = input()
     if True:
         log.info("Stoping cntlm service")
-        win32serviceutil.StopService('cntlm', proxy_addr)
+        #win32serviceutil.StopService('cntlm', proxy_addr)
         log.info("done")
-        
+
     exit_program()
