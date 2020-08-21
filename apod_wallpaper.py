@@ -125,10 +125,7 @@ def exit_program():
     sys.exit()
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     print_banner()
-=======
->>>>>>> 46fb1c45c4af44b82786bbbdd97b4536abc5ad4b
     if True and not cntlm_running():
         log.info("Starting cntlm service")
         win32serviceutil.StartService('cntlm', proxy_addr)
@@ -158,13 +155,7 @@ if __name__ == '__main__':
                 user_input = input()
     if True:
         log.info("Stoping cntlm service")
-<<<<<<< HEAD
-        #win32serviceutil.StopService('cntlm', proxy_addr)
-        log.info("done")
-
-=======
         win32serviceutil.StopService('cntlm', proxy_addr)
         log.info("done")
-        
->>>>>>> 46fb1c45c4af44b82786bbbdd97b4536abc5ad4b
+
     exit_program()
