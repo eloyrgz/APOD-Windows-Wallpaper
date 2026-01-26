@@ -1,67 +1,70 @@
 # APOD Windows Wallpaper
-This script downloads the Astronomy Picture of the Day from the Nasa website and sets it as your Windows wallpaper. It also shows the title and explanation while the picture is being downloaded and once the wallpaper was set, lets you to change among 4 different image's styles (center, stretch, fit, fill) using the number keys 1 to 4. Default is fill, 4. Any other key exits the program.
+Small utility that downloads NASA's Astronomy Picture of the Day (APOD) and sets it as the Windows desktop wallpaper.
 
-Follow the installation and configuration instructions. If something doesn't work set the logging level to INFO to see the messages about what the script is doing and help you to detect the problem.
+**Current status (refactor):** the code is organized as a Python package (`apod_wallpaper`) with a small CLI. Legacy CNTLM/service code, CI and several helper scripts were removed; useful unit tests are kept in the `tests` folder.
 
-Then I recommend adding the script to the Windows startup to run every time you are logged in or at a scheduled time for instance. You can also setup the Windows screensaver to show the imagery from the downloads folder of the script.
+**Key files:**
+- **Config:** [apod_wallpaper.conf](apod_wallpaper.conf)
+- **Entrypoint:** [apod_wallpaper.py](apod_wallpaper.py)
+- **Package:** [apod_wallpaper/](apod_wallpaper)
+- **Tests:** [tests/](tests)
 
-## Features
-- Sets the NASA APOD as your Windows wallpaper in HD quality.
-- Shows the title and explanation of the picture.
-- Different image's styles (center, stretch, fit, fill).
-- Supports proxy settings.
-- Provides a logger for debuging and helping you if something doesn't work.
+**Features**
+- Downloads APOD and saves it to a local `download_path`.
+- Sets the Windows wallpaper (uses pywin32 when available).
+- Interactive style selection (center/stretch/fit/fill) via console.
+- Config-driven (API key, URL, download path, optional proxy settings).
 
-## Requirements
-- A Windows OS
-- Python 3 or higher
-- PyWin32
-- A few python packages (requests, configparser, warnings, pillow)
-- Miniconda (optional)
-- CNTLM (optional)
+**Requirements**
+- Windows (setting wallpaper is Windows-specific).
+- Python 3.8+.
+- Runtime dependencies: see [requirements.txt](requirements.txt).
+- Optional: `pywin32` to actually set the wallpaper via Windows APIs.
 
-## Installation with Conda (recommended)
+**Install and run (recommended using `uv`)**
+1. Install Python with `uv` (if you use `uv`):
 
-- Well, first you will need to install [miniconda](https://docs.conda.io/en/latest/miniconda.html). 
-- Then run the following commands:
+```powershell
+%USERPROFILE%\.local\bin\uv.exe python install 3.11 --default
+%USERPROFILE%\.local\bin\uv.exe venv .venv
+```
 
-  ```python
-  conda create -n apod.py3.6 python=3.6
-  conda activate apod.py3.6
-  conda install requests configparser warnings
-  conda install -c anaconda pywin32
-  pip install pillow 
-  ```
+2. Activate the venv and install runtime deps:
 
-## Installation with PIP
-- Download and install [Python](https://www.python.org/downloads/)
-- Download and install [PyWin32](https://sourceforge.net/projects/pywin32/)
-- Install Python packages
+```powershell
+.venv\Scripts\activate.ps1
+python -m pip install -r requirements.txt
+```
 
-  ```python
-  pip install requests pillow configparser warnings
-  ```  
-  
-## Configuration
-Edit the config file to fit your sistem. the only field required is download_path the rest are optional.
-- **download_path**
-  
-  Your local path where the images will be downloaded.
+3. Run the CLI (interactive):
 
-- **api_key** 
+```powershell
+.venv\Scripts\python.exe -m apod_wallpaper
+```
 
-  DEMO_KEY should be enough but you can always ask for your own API key [here](https://api.nasa.gov/index.html#apply-for-an-api-key).
-  
-  
+Or use the provided batch launcher:
 
-- **proxy**
+```powershell
+.\init.bat --once --verbose
+```
 
-  If you were sometimes behind a proxy, for instance at work or at university and you would like to keep updating your wallpaper, you can install cntlm from [here](https://sourceforge.net/projects/cntlm/) and set it up as a gateway to your corporate proxy.
-  
-## Run at Windows startup
-To change your wallpaper at Windows startup, create a shortcut to apod_wallpaper.py in Start->All Programs->Startup. 
-If you are one of those like me who doesn't logoff very often you will also have the script to hand whenever you want to update your wallpaper.
+**CLI flags**
+- `--config, -c`: Path to `apod_wallpaper.conf` (default: current working directory).
+- `--once`: Download and set wallpaper once, then exit.
+- `--verbose, -v`: Enable INFO logging.
 
-## Windows screensaver setup
-Setup the Windows screensaver to use the imagery from the folder that you have configured as your download path. 
-Maybe not at the beginning but with some time you will have a nice collection of pictures of universe.
+During interactive mode the script prints a numbered list of styles and prompts for a number (1-4) to change the wallpaper style; any other input exits.
+
+**Testing**
+- Tests are in [tests/](tests). Run them inside the venv:
+
+```powershell
+.venv\Scripts\python.exe -m unittest discover -v
+```
+
+**Notes**
+- Legacy CNTLM/service-management code and CI workflow were removed in this refactor. If you relied on CNTLM, configure your system proxy or run the script without proxy settings in the config.
+- If you prefer a packaged installer or CI, I can add a minimal `pyproject.toml` and workflow back.
+
+---
+If you want the banner or other output adjusted, tell me how you'd like it to appear.

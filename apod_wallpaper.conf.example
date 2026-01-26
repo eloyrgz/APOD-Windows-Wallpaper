@@ -1,0 +1,15 @@
+[api]
+url = https://api.nasa.gov/planetary/apod
+# Use your API key here; DO NOT commit your real key to the repo.
+key = DEMO_KEY
+
+[proxy]
+#address = 127.0.0.1
+#port = 3128
+
+[default]
+# Local folder where downloaded images will be saved
+download_path = C:\Users\YourUser\Pictures\APOD
+
+# Wallpaper style: 1=center, 2=stretch, 3=fit, 4=fill
+wallpaper_style = 3

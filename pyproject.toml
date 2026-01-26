@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "apod-windows-wallpaper"
+version = "0.1.0"
+description = "Set NASA APOD as Windows wallpaper"
+requires-python = ">=3.8"
+
+[project.scripts]
+apod-wallpaper = "apod_wallpaper.cli:cli_main"
