@@ -3,7 +3,7 @@ import logging
 import shutil
 from pathlib import Path
 from .config import Config
-from .api_client import get_apod_json
+from .api_client import get_apod_json, dispatch_http_get
 from .wallpaper import download_image, set_windows_wallpaper, style_names
 
 log = logging.getLogger(__name__)
@@ -47,10 +47,10 @@ def main(config_path: Path, once: bool = False) -> None:
         set_windows_wallpaper(filename, cfg.def_wallpaper_style)
     else:
         # Interactive style selection loop
-        print("Select wallpaper style by entering its number and press Enter:")
+        print("Select wallpaper style by entering its number:")
         for k, v in style_names.items():
             print(f"  {k}: {v}")
-        print("Enter any other key to exit.")
+        print("Press 1-4 repeatedly to change style; press any other key to exit.")
 
         user_input = cfg.def_wallpaper_style
         # apply the initial/default style first
@@ -59,12 +59,84 @@ def main(config_path: Path, once: bool = False) -> None:
         except Exception:
             pass
 
-        while True:
-            user_input = input("Style number (1-4) or other to exit: ").strip()
-            if user_input.isnumeric() and 1 <= int(user_input) <= len(style_names):
-                set_windows_wallpaper(filename, int(user_input))
-            else:
-                break
+        # Prefer single-key input on Windows (no Enter required)
+        try:
+            import msvcrt
+
+            print("Waiting for keypress... (1-4 change style, n download new image, other to exit)")
+            while True:
+                ch = msvcrt.getwch()
+                if ch in ('1', '2', '3', '4'):
+                    set_windows_wallpaper(filename, int(ch))
+                elif ch in ('n', 'N'):
+                    # fetch a random APOD (count=1)
+                    url = f"{cfg.apod_url}count=1&api_key={cfg.api_key}"
+                    r = dispatch_http_get(url, proxies=cfg.proxies)
+                    if r is None:
+                        print("Failed to fetch new image")
+                        continue
+                    try:
+                        data = r.json()
+                    except Exception:
+                        print("Invalid response for new image")
+                        continue
+                    # API returns a list when using count
+                    if isinstance(data, list) and data:
+                        item = data[0]
+                    elif isinstance(data, dict):
+                        item = data
+                    else:
+                        print("No image returned")
+                        continue
+                    if item.get('media_type') != 'image':
+                        print("Fetched item is not an image")
+                        continue
+                    url_img = item.get('hdurl', item.get('url'))
+                    print(f"Downloading: {item.get('title', '')}")
+                    filename = download_image(url_img, cfg.download_path, proxies=cfg.proxies)
+                    # apply default style to the new image
+                    try:
+                        set_windows_wallpaper(filename, int(cfg.def_wallpaper_style))
+                    except Exception:
+                        pass
+                else:
+                    break
+        except Exception:
+            # Fallback for non-Windows or if msvcrt unavailable: line-based input
+            while True:
+                user_input = input("Style number (1-4), n for new image, or other to exit: ").strip()
+                if user_input.lower() == 'n':
+                    url = f"{cfg.apod_url}count=1&api_key={cfg.api_key}"
+                    r = dispatch_http_get(url, proxies=cfg.proxies)
+                    if r is None:
+                        print("Failed to fetch new image")
+                        continue
+                    try:
+                        data = r.json()
+                    except Exception:
+                        print("Invalid response for new image")
+                        continue
+                    if isinstance(data, list) and data:
+                        item = data[0]
+                    elif isinstance(data, dict):
+                        item = data
+                    else:
+                        print("No image returned")
+                        continue
+                    if item.get('media_type') != 'image':
+                        print("Fetched item is not an image")
+                        continue
+                    url_img = item.get('hdurl', item.get('url'))
+                    print(f"Downloading: {item.get('title', '')}")
+                    filename = download_image(url_img, cfg.download_path, proxies=cfg.proxies)
+                    try:
+                        set_windows_wallpaper(filename, int(cfg.def_wallpaper_style))
+                    except Exception:
+                        pass
+                elif user_input.isnumeric() and 1 <= int(user_input) <= len(style_names):
+                    set_windows_wallpaper(filename, int(user_input))
+                else:
+                    break
 
     # legacy cntlm handling removed
 
