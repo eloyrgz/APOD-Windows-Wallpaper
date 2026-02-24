@@ -1,6 +1,7 @@
 import argparse
 import logging
 import shutil
+import os
 from pathlib import Path
 from .config import Config
 from .api_client import get_apod_json, dispatch_http_get
@@ -41,6 +42,28 @@ def main(config_path: Path, once: bool = False) -> None:
     print(content.get('explanation', '') + '\n')
     url_img = content.get('hdurl', content.get('url'))
     filename = download_image(url_img, cfg.download_path, proxies=cfg.proxies)
+
+    def show_and_apply(item):
+        try:
+            os.system('cls' if os.name == 'nt' else 'clear')
+        except Exception:
+            pass
+        print_banner()
+        print(item.get('title', '') + '\n')
+        print(item.get('explanation', '') + '\n')
+        url_img_local = item.get('hdurl', item.get('url'))
+        fname = download_image(url_img_local, cfg.download_path, proxies=cfg.proxies)
+        try:
+            set_windows_wallpaper(fname, int(cfg.def_wallpaper_style))
+        except Exception:
+            pass
+        # Reprint the style selection and waiting prompt to match initial display
+        print("Select wallpaper style by entering its number:")
+        for k, v in style_names.items():
+            print(f"  {k}: {v}")
+        print("Press 1-4 repeatedly to change style; press any other key to exit.")
+        print("Waiting for keypress... (1-4 change style, n download new image, other to exit)")
+        return fname
 
     # If --once, set wallpaper with default style and exit
     if once:
@@ -91,14 +114,8 @@ def main(config_path: Path, once: bool = False) -> None:
                     if item.get('media_type') != 'image':
                         print("Fetched item is not an image")
                         continue
-                    url_img = item.get('hdurl', item.get('url'))
-                    print(f"Downloading: {item.get('title', '')}")
-                    filename = download_image(url_img, cfg.download_path, proxies=cfg.proxies)
-                    # apply default style to the new image
-                    try:
-                        set_windows_wallpaper(filename, int(cfg.def_wallpaper_style))
-                    except Exception:
-                        pass
+                    # show details, download and apply (same as initial display)
+                    filename = show_and_apply(item)
                 else:
                     break
         except Exception:
@@ -126,13 +143,7 @@ def main(config_path: Path, once: bool = False) -> None:
                     if item.get('media_type') != 'image':
                         print("Fetched item is not an image")
                         continue
-                    url_img = item.get('hdurl', item.get('url'))
-                    print(f"Downloading: {item.get('title', '')}")
-                    filename = download_image(url_img, cfg.download_path, proxies=cfg.proxies)
-                    try:
-                        set_windows_wallpaper(filename, int(cfg.def_wallpaper_style))
-                    except Exception:
-                        pass
+                    filename = show_and_apply(item)
                 elif user_input.isnumeric() and 1 <= int(user_input) <= len(style_names):
                     set_windows_wallpaper(filename, int(user_input))
                 else:
