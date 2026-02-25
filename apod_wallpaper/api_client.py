@@ -4,6 +4,7 @@ from typing import Optional
 import requests
 import warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from requests.exceptions import ProxyError
 
 log = logging.getLogger(__name__)
 
@@ -17,6 +18,15 @@ def dispatch_http_get(url: str, proxies: Optional[dict] = None, timeout: int = 3
         r = requests.get(url, proxies=proxies, verify=False, timeout=timeout)
         r.raise_for_status()
         return r
+    except ProxyError as e:
+        log.warning("Proxy error while connecting to %s: %s — retrying without proxy", url, e)
+        try:
+            r = requests.get(url, verify=False, timeout=timeout)
+            r.raise_for_status()
+            return r
+        except Exception as e2:
+            log.error("HTTP GET error after retry without proxy: %s", e2)
+            return None
     except Exception as e:
         log.error("HTTP GET error: %s", e)
         return None

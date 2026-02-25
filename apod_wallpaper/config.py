@@ -17,14 +17,7 @@ class Config:
     @property
     def proxies(self):
         if self.proxy_addr and self.proxy_port:
-            addr = self.proxy_addr
-            # allow users to include a scheme in the address (http:// or https://)
-            if addr.startswith("http://") or addr.startswith("https://"):
-                base = addr
-            else:
-                # most corporate proxies speak plain HTTP for both http and https tunnelling
-                base = f"http://{addr}"
-            return {"http": f"{base}:{self.proxy_port}", "https": f"{base}:{self.proxy_port}"}
+            return {"https": f"https://{self.proxy_addr}:{self.proxy_port}", "http": f"http://{self.proxy_addr}:{self.proxy_port}"}
         return None
 
     @classmethod
