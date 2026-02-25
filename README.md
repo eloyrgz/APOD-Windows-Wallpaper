@@ -62,9 +62,3 @@ During interactive mode the script prints a numbered list of styles and prompts 
 .venv\Scripts\python.exe -m unittest discover -v
 ```
 
-**Notes**
-- Legacy CNTLM/service-management code and CI workflow were removed in this refactor. If you relied on CNTLM, configure your system proxy or run the script without proxy settings in the config.
-- If you prefer a packaged installer or CI, I can add a minimal `pyproject.toml` and workflow back.
-
----
-If you want the banner or other output adjusted, tell me how you'd like it to appear.
